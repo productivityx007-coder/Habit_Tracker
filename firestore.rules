@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the requester is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if the user is operating on their own document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // User Profile: only owner can read and write their document
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Habits subcollection: users can only manage their own habits
+      match /habits/{habitId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Completions subcollection: users can only manage their own completions
+      match /completions/{completionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Settings subcollection: users can only manage their own preferences
+      match /settings/{settingId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Fallback rule: deny all other access
+    match /{document=**} {
+      allow read, write: false;
+    }
+  }
+}

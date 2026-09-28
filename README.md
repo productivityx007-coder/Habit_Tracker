@@ -133,9 +133,4 @@ VITE_FIREBASE_APP_ID=1:1234567890:web:...
 
 ---
 
-## 🔒 Security Architecture
 
-The application enforces per-user isolation:
-- Data is stored in Firestore subcollections under `/users/{userId}/habits/{habitId}` and `/users/{userId}/completions/{completionId}`.
-- `firestore.rules` ensures that `request.auth.uid == userId` for all read, write, and delete operations.
-- No client can read or modify another user's habits or progress.

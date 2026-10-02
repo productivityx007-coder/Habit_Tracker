@@ -8,6 +8,9 @@ interface DeleteConfirmModalProps {
   title: string;
   message: string;
   isDestructive?: boolean;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  warningText?: string;
 }
 
 export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
@@ -16,13 +19,16 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onConfirm,
   title,
   message,
+  confirmLabel = 'Delete Permanently',
+  cancelLabel = 'Cancel',
+  warningText = 'This action cannot be undone. Historical tracking data will be removed.',
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
-      <div 
-        className="modal-content animate-slide-up" 
+      <div
+        className="modal-content animate-slide-up"
         onClick={(e) => e.stopPropagation()}
         style={{ maxWidth: '440px' }}
       >
@@ -40,23 +46,25 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           <p style={{ fontSize: '0.925rem', color: 'var(--text-secondary)' }}>
             {message}
           </p>
-          <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'var(--error-bg)', color: 'var(--error-text)', fontSize: '0.8rem' }}>
-            This action cannot be undone. Historical tracking data will be removed.
-          </div>
+          {warningText && (
+            <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'var(--error-bg)', color: 'var(--error-text)', fontSize: '0.8rem' }}>
+              {warningText}
+            </div>
+          )}
         </div>
 
         <div className="modal-footer">
           <button onClick={onClose} className="btn btn-secondary">
-            Keep Habit
+            {cancelLabel}
           </button>
-          <button 
+          <button
             onClick={() => {
               onConfirm();
               onClose();
-            }} 
+            }}
             className="btn btn-danger"
           >
-            Delete Permanently
+            {confirmLabel}
           </button>
         </div>
       </div>

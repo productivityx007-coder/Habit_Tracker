@@ -2,7 +2,7 @@ import React from 'react';
 import { Check, Plus, Minus, Flame, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useHabits } from '../../context/HabitContext';
-import { getTodayString } from '../../utils/dateUtils';
+import { getTodayString, formatFriendlyDate } from '../../utils/dateUtils';
 import { isHabitScheduledOnDate } from '../../utils/analyticsUtils';
 
 interface TodayHabitsListProps {
@@ -16,9 +16,11 @@ export const TodayHabitsList: React.FC<TodayHabitsListProps> = ({ onOpenAddHabit
     toggleHabitCompletion,
     updateHabitNumericValue,
     monthOverview,
+    todayStr: contextTodayStr,
   } = useHabits();
 
-  const todayStr = getTodayString();
+  const todayStr = contextTodayStr || getTodayString();
+  const friendlyDate = formatFriendlyDate(todayStr);
   const activeHabits = habits.filter((h) => !h.archived);
   const scheduledToday = activeHabits.filter((h) => isHabitScheduledOnDate(h, todayStr));
 
@@ -36,7 +38,7 @@ export const TodayHabitsList: React.FC<TodayHabitsListProps> = ({ onOpenAddHabit
         <div>
           <h2 className="card-title">Today's Focus Checklist</h2>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            One-tap daily check-in to build lasting habits
+            {friendlyDate} • One-tap daily check-in to build lasting habits
           </span>
         </div>
         <Link to="/matrix" className="btn btn-ghost" style={{ fontSize: '0.825rem', gap: '4px' }}>

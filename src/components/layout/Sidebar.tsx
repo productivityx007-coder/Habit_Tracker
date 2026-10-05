@@ -11,9 +11,11 @@ import {
   LogOut,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface SidebarProps {
   isMobileOpen: boolean;
@@ -59,6 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { to: '/habits', label: 'Manage Habits', icon: CheckSquare },
     { to: '/calendar', label: 'Calendar', icon: CalendarDays },
     { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/friends', label: 'Friends', icon: Users },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];
 
@@ -151,9 +154,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="sidebar-footer">
           {user && (
             <div className={`user-badge-container ${isCollapsed ? 'collapsed' : ''}`}>
-              <img 
-                src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName || 'User')}`}
-                alt="Avatar"
+              <UserAvatar 
+                photoURL={user.photoURL}
+                displayName={user.displayName}
                 className="user-avatar"
                 title={isCollapsed ? `${user.displayName || 'Explorer'} (${user.isGuest ? 'Demo' : user.email})` : undefined}
               />

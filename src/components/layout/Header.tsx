@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Plus, Sun, Moon, Cloud, HardDrive } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useHabits } from '../../context/HabitContext';
 import { formatFriendlyDate, getTodayString } from '../../utils/dateUtils';
 
 interface HeaderProps {
@@ -15,12 +16,12 @@ export const Header: React.FC<HeaderProps> = ({
   isSidebarCollapsed = false
 }) => {
   const { user, isFirebaseMode } = useAuth();
+  const { todayStr } = useHabits();
   const [isDark, setIsDark] = useState<boolean>(() => {
     return document.documentElement.getAttribute('data-theme') === 'dark';
   });
 
-  const todayStr = getTodayString();
-  const friendlyToday = formatFriendlyDate(todayStr);
+  const friendlyToday = formatFriendlyDate(todayStr || getTodayString());
 
   const getGreeting = () => {
     const hour = new Date().getHours();

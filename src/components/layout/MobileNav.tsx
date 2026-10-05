@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Table2, CalendarDays, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, Table2, Users, BarChart3, Settings } from 'lucide-react';
 
 export const MobileNav: React.FC = () => {
   return (
@@ -22,11 +22,11 @@ export const MobileNav: React.FC = () => {
       </NavLink>
 
       <NavLink 
-        to="/calendar" 
+        to="/friends" 
         className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
       >
-        <CalendarDays size={20} />
-        <span>Calendar</span>
+        <Users size={20} />
+        <span>Friends</span>
       </NavLink>
 
       <NavLink 

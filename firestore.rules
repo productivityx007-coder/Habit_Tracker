@@ -12,7 +12,9 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // User Profile: only owner can read and write their document
+    // ==========================================
+    // PRIVATE USER DATA (Strictly Owner-Only)
+    // ==========================================
     match /users/{userId} {
       allow read, write: if isOwner(userId);
 
@@ -30,6 +32,56 @@ service cloud.firestore {
       match /settings/{settingId} {
         allow read, write: if isOwner(userId);
       }
+    }
+
+    // ==========================================
+    // PUBLIC / SOCIAL DATA (Decoupled & Safe)
+    // ==========================================
+
+    // Public Profiles: Opted-in discovery directory
+    // Private users (profileVisibility == 'private') can never be read by other users
+    match /public_profiles/{userId} {
+      allow read: if isAuthenticated() && resource.data.profileVisibility in ['friends', 'public'];
+      allow write: if isOwner(userId);
+    }
+
+    // Friend Requests: Only sender and recipient have access
+    match /friend_requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toUserId == request.auth.uid
+      );
+
+      // Create: Authenticated sender, not self-request, status pending
+      allow create: if isAuthenticated() &&
+        request.resource.data.fromUserId == request.auth.uid &&
+        request.resource.data.toUserId != request.auth.uid &&
+        request.resource.data.status == 'pending';
+
+      // Update: Recipient accepting/declining or sender modifying
+      allow update: if isAuthenticated() && (
+        resource.data.toUserId == request.auth.uid ||
+        resource.data.fromUserId == request.auth.uid
+      );
+
+      // Delete/Cancel: Either sender or recipient can cancel/delete request
+      allow delete: if isAuthenticated() && (
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toUserId == request.auth.uid
+      );
+    }
+
+    // Friendships: Active friendships accessible only to the 2 friends
+    match /friendships/{friendshipId} {
+      allow read, delete: if isAuthenticated() && (
+        resource.data.user1Id == request.auth.uid ||
+        resource.data.user2Id == request.auth.uid
+      );
+
+      allow create: if isAuthenticated() && (
+        request.resource.data.user1Id == request.auth.uid ||
+        request.resource.data.user2Id == request.auth.uid
+      );
     }
 
     // Fallback rule: deny all other access
